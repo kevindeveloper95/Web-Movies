@@ -4,22 +4,40 @@ import MovieCard from '../MoviesCard/MovieCard'
 import styles from '../MoviesGrid/MoviesGrid.module.css'
 import { useEffect  } from 'react'
 import { Get } from '../httpClient'
+import SpinLoading from '../SpinLoading/SpinLoading'
 
 
-const MoviesGrid = () => {
+
+
+
+
+export const MoviesGrid = ({search}) => {
      
-    const [Movies, setMovies] = useState([])
-    useEffect(() => {
-        Get("/discover/movie").then((data) => {
-          setMovies(data.results);
-        });
-      }, []);
+ const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  
+
+  useEffect(() => {
+    setIsLoading(true);
+    const searchUrl = search
+      ? "/search/movie?query=" + search
+      : "/discover/movie";
+    Get(searchUrl).then((data) => {
+      setMovies(data.results);
+      setIsLoading(false);
+    });
+  }, [search]);
+
+      if(isLoading){
+       return <SpinLoading/>
+      }
 
    
     return (
         <Fragment>
             <ul className={styles.moviesGrid}>
-                {Movies.map((movie)=>{
+                {movies.map((movie)=>{
                  return <MovieCard key={movie.id} movie={movie}/>
                  
                 })}
